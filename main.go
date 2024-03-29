@@ -11,6 +11,10 @@ import (
 	"html/template"
 )
 
+func safeHTML(s string) template.HTML {
+	return template.HTML(s)
+}
+
 type Event struct {
 	Summary     string
 	Start       string
@@ -68,8 +72,8 @@ func main() {
 	cal, err := ics.ParseCalendar(file)
 	handleErr(err)
 
-	mkTemplate, err := template.ParseFiles(*mkTemplateFileName)
-	handleErr(err)
+	mkTemplate := template.New(*mkTemplateFileName).Funcs(template.FuncMap{"safeHTML": safeHTML})
+	mkTemplate.ParseFiles(*mkTemplateFileName)
 
 	events := []*Event{}
 	for _, e := range cal.Events() {
